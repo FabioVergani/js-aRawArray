@@ -1,0 +1,40 @@
+~~something;
+The bitwise NOT operator (~) will take its operand, convert it to a 32-bit integer, and will invert each bit so that each 0 becomes a 1 and vice versa.
+00000000000000000000000000001001
+...becomes
+11111111111111111111111111110110
+The effect of this, given the expression ~foo is -(foo + 1). A double bitwise NOT operation (~~foo) will therefore result in -(-(foo + 1) + 1). This only remains true for integers though; given all the potential operands, the real equivalent expression to ~~ is probably something like:
+typeof foo === 'number' && !isNaN(foo) && foo !== Infinity
+    ? foo > 0 ? Math.floor(foo) : Math.ceil(foo) : 0;
+// This is ONLY _effectively_ the same... this is
+// NOT what happens internally!
+This is obviously a fair bit slower than ~~.
+If the operand is a number and it’s not NaN or Infinity then ~~ will have the effect of rounding it towards zero (Math.ceil for negative, Math.floor for positive). If it’s not a number, then I believe the internal ToInt32 function converts it to zero.
+Here are some examples of the double-bitwise NOT operation in all its glory:
+
+
+
+~~null;      // => 0
+~~undefined; // => 0
+~~0;         // => 0
+~~{};        // => 0
+~~[];        // => 0
+~~(1/0);     // => 0
+~~false;     // => 0
+~~true;      // => 1
+~~1.2543;    // => 1
+~~4.9;       // => 4
+~~(-2.999);  // => -2
+
+
+
+~~‘s flooring capabilities make it a better alternative to Math.floor if you know you’re dealing with positives — it’s faster and takes up less characters. It’s not quite as readable though, but I’m hoping that ~~ will slowly become a very well-known technique in the JS arena, so we can all use it without fearing accusations.
+It’s quite useful for normalizing arguments that you expect to be integers too. Take this example from what the MDC recommends for providing Array.prototype.indexOf to non-supporting browsers:
+/*Array.prototype.indexOf = function...*/
+var from = Number(arguments[1]) || 0;  
+from = (from < 0)  
+     ? Math.ceil(from)  
+     : Math.floor(from);
+In goes ~~:
+/*Array.prototype.indexOf = function...*/
+var from = ~~arguments[1];
