@@ -1,7 +1,8 @@
 (function(){
  function aRawArray(i){return setProto(Array(i),RawArrayProto);};
 
- const RawArrayProto=Object.setPrototypeOf([],null);
+ const setProto=Object.setPrototypeOf;
+ const RawArrayProto=setProto([],null);
 
  var a=aRawArray();
  var b=aRawArray(9);
@@ -10,3 +11,4 @@
  console.log('a',a,a.length,'b',b,b.length);
 
 })();
+
